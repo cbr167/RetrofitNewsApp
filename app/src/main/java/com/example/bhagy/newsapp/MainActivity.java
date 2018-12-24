@@ -20,6 +20,16 @@ public class MainActivity extends AppCompatActivity {
     RemoteInterface remoteInterface;
     GetItems getItems;
     int noOfItem;
+    private static int newsId;
+
+    public static int getNewsId() {
+        return newsId;
+    }
+
+    public void setNewsId(int newsId) {
+        this.newsId = newsId;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,13 +49,19 @@ public class MainActivity extends AppCompatActivity {
                    noOfItem = response.body().size();
                }
                for(int i = 0;i <=noOfItem;i++){
-                   getItems = new GetItems() {
-                       @Override
-                       public int getNewsItem() {
-                           return noOfItem;
-                       }
-                   };
 
+                   Call<Response> newsCallItems = remoteInterface.getNewsResponse(response.body().get(i));
+                   newsCallItems.enqueue(new Callback<Response>() {
+                       @Override
+                       public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                           Log.d("newsItemss", response.body().getTitle() +  "  " + response.body().getUrl());
+                       }
+
+                       @Override
+                       public void onFailure(Call<Response> call, Throwable t) {
+                           Log.d("newsItemss", "fail");
+                       }
+                   });
                }
            }
 
@@ -54,18 +70,5 @@ public class MainActivity extends AppCompatActivity {
 
            }
        });
-//            @Override
-//            public void onResponse(Call<List<Response>> call, retrofit2.Response<List<Response>> response) {
-//                Toast.makeText(MainActivity.this, (CharSequence) response.body
-//                        (), Toast.LENGTH_SHORT).show();
-//                Log.d("response",response.body().toString());
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<Response>> call, Throwable t) {
-//                Toast.makeText(MainActivity.this, "fail", Toast.LENGTH_SHORT).show();
-//                Log.d("response",t.getMessage());
-//            }
-//        });
     }
 }
